@@ -1,0 +1,189 @@
+Завдання 1
+import java.util.function.Predicate;
+
+Predicate<Integer> isPrime = n -> {
+    if (n < 2) return false;
+    for (int i = 2; i * i <= n; i++) {
+        if (n % i == 0) return false;
+    }
+    return true;
+};
+Завдання 2
+
+Клас Student:
+class Student {
+    private String name;
+    private String group;
+    private int[] marks;
+
+    public Student(String name, String group, int[] marks) {
+        this.name = name;
+        this.group = group;
+        this.marks = marks;
+    }
+
+    public String getName() { return name; }
+    public String getGroup() { return group; }
+    public int[] getMarks() { return marks; }
+
+    public boolean hasDebt() {
+        for (int m : marks)
+            if (m < 60) return true;
+        return false;
+    }
+}
+
+Метод фільтрації:
+public static Student[] filter(Student[] students, Predicate<Student> predicate) {
+    return java.util.Arrays.stream(students)
+            .filter(predicate)
+            .toArray(Student[]::new);
+}
+
+Перевірка на предикат "має хоча б одну заборгованість":
+Predicate<Student> hasDebts = s -> s.hasDebt();
+
+Student[] arr = {
+    new Student("Іван", "IP-21", new int[]{80, 90, 100}),
+    new Student("Петро", "IP-22", new int[]{40, 75, 60}),
+    new Student("Марія", "IP-23", new int[]{59, 100, 90})
+};
+
+Student[] result = filter(arr, hasDebts);
+
+for (Student s : result)
+    System.out.println(s.getName());
+
+Завдання 3
+public static Student[] filter(Student[] students,
+                               Predicate<Student> p1,
+                               Predicate<Student> p2) {
+
+    return java.util.Arrays.stream(students)
+            .filter(p1.and(p2))
+            .toArray(Student[]::new);
+}
+
+Завдання 4
+Інтерфейс:
+interface StudentConsumer {
+    void accept(Student s);
+}
+
+Реалізація через лямбда-вираз:
+StudentConsumer printName = 
+    s -> System.out.println(s.getName().toUpperCase());
+
+Метод forEach:
+public static void forEach(Student[] students, StudentConsumer consumer) {
+    for (Student s : students)
+        consumer.accept(s);
+}
+
+Використання:
+forEach(arr, printName);
+
+Завдання 5
+public static <T> void applyIf(T[] array, 
+                               Predicate<T> predicate,
+                               java.util.function.Consumer<T> consumer) {
+
+    for (T el : array) {
+        if (predicate.test(el)) {
+            consumer.accept(el);
+        }
+    }
+}
+
+Приклад:
+Integer[] nums = {1, 4, 5, 8, 10, 15};
+
+Predicate<Integer> even = n -> n % 2 == 0;
+Predicate<Integer> greater5 = n -> n > 5;
+
+java.util.function.Consumer<Integer> print = n -> 
+    System.out.println("Число: " + n);
+
+applyIf(nums, even, print);
+applyIf(nums, greater5, print);
+
+Завдання 6
+import java.util.function.Function;
+
+Function<Integer, Integer> pow2 = n -> (int)Math.pow(2, n);
+
+Тест:
+java
+Копировать код
+int[] arr10 = {0,1,2,3,4,5,6,7,8,9};
+
+for (int x : arr10)
+    System.out.println(pow2.apply(x));
+
+Завдання 7
+Метод:
+
+public static String[] stringify(int[] arr, Function<Integer, String> f) {
+    String[] out = new String[arr.length];
+    for (int i = 0; i < arr.length; i++)
+        out[i] = f.apply(arr[i]);
+    return out;
+}
+
+
+Function:
+
+Function<Integer, String> numToWord = n -> {
+    switch (n) {
+        case 0: return "нуль";
+        case 1: return "один";
+        case 2: return "два";
+        case 3: return "три";
+        case 4: return "чотири";
+        case 5: return "п'ять";
+        case 6: return "шість";
+        case 7: return "сім";
+        case 8: return "вісім";
+        case 9: return "дев'ять";
+    }
+    return "?";
+};
+
+Використання:
+
+int[] numbers = {0,1,2,3,4,5,6,7,8,9};
+
+String[] words = stringify(numbers, numToWord);
+
+for (String s : words)
+    System.out.println(s);
+
+Додаткове завдання
+
+Замість:
+
+Collections.sort(students, new LastNameSorter());
+
+Пишу:
+
+Сортування за ім’ям:
+
+students.sort((s1, s2) -> s1.getName().compareTo(s2.getName()));
+if (!nameAsc) Collections.reverse(students);
+nameAsc = !nameAsc;
+
+Сортування за прізвищем:
+
+students.sort((s1, s2) -> s1.getLastName().compareTo(s2.getLastName()));
+if (!lastNameAsc) Collections.reverse(students);
+lastNameAsc = !lastNameAsc;
+
+Сортування за середнім балом:
+
+students.sort((s1, s2) -> {
+    if (s1.getAverageGrade() < s2.getAverageGrade()) return -1;
+    if (s1.getAverageGrade() > s2.getAverageGrade()) return 1;
+    return 0;
+});
+if (!gradeAsc) Collections.reverse(students);
+gradeAsc = !gradeAsc;
